@@ -1,0 +1,298 @@
+{% extends 'base.html' %}
+
+na górze szczegóły delegacji, od razu poniżej dodawanie wydatku a jeszcze niżej lista z dodanymi wydatkami
+{% block content %}
+        <!-- DELEGACJA -->
+
+        {% if delegacja %}
+            {% if delegacja.akceptacja_planowanej %}
+                {% if  delegacja.akceptacja_zrealizowanej %}
+                     <div class="card"><h5>Delegacja ukończona i zatwierdzona</h5></div>
+                {% else %}
+                    <div class="card"><h5>Delegacja zaakceptowana. Czeka na akceptację wydatków</h5></div>
+                {% endif %}
+            {% else %}
+                <div class="card"><h5>Delegacja czeka na zaakceptowanie</h5></div>
+            {% endif %}
+
+          <table class="table table-dark">
+            <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Kraj</th>
+                  <th scope="col">Miasto</th>
+                  <th scope="col">Data Wniosku</th>
+                  <th scope="col">Początek</th>
+                  <th scope="col">Koniec</th>
+                </tr>
+            </thead>
+
+             <tbody>
+                <tr>
+                      <th scope="row">{{ delegacja.pk }}</th>
+
+                      <td>{{ delegacja.kraj }}</td>
+
+                      <td>{{ delegacja.miasto }}</td>
+
+                      <td>{{ delegacja.data_wniosku }}</td>
+
+                      <td>{{ delegacja.poczatek }}</td>
+
+                      <td>{{ delegacja.koniec }}</td>
+                      {% if czy_kierownik == "TAK" and delegacja.do_managera %}
+                          {% if delegacja.akceptacja_planowanej %}
+                                {% if  not delegacja.akceptacja_zrealizowanej %}
+                                 <td>
+                                  <form action="{% url 'zatwierdz_wydatki' delegacja.id %}" method="post">
+                                      {% csrf_token %}
+                                      <input type="submit" value="Zatwierdź wydatki" class="btn btn-success"
+                                            onclick="return confirm('Czy napewno chcesz zatwierdzić wydatki dla delegacji {{ delegacja }} ?');"/>
+                                  </form>
+                                 </td>
+                                 <!-- musi być też możłiwość cofnięcia wydatków-->
+                                 <td>
+                                  <form action="{% url 'cofnij_wydatki' delegacja.id %}" method="post">
+                                      {% csrf_token %}
+                                      <input type="submit" value="Cofnij wydatki" class="btn btn-warning"
+                                     onclick="return confirm('Czy napewno chcesz cofnąć wydatki dla delegacji {{ delegacja }} ?');"/>
+                                  </form>
+                                 </td>
+                                 {% endif %}
+                          {% else %}
+                             <td>
+                              <form action="{% url 'zatwierdz_delegacje' delegacja.id %}" method="post">
+                                  {% csrf_token %}
+                                  <input type="submit" value="Zatwierdź delegację" class="btn btn-success"
+                                     onclick="return confirm('Czy napewno chcesz zatwierdzić delegację {{ delegacja }} ?');"/>
+                              </form>
+                             </td>
+                             <!-- musi być też możłiwość cofnięcia delegacji-->
+                             <td>
+                                 <form action="{% url 'cofnij_delegacje' delegacja.id %}" method="post">
+                                     {% csrf_token %}
+                                     <input type="submit" value="Cofnij delegację" class="btn btn-warning"
+                                        onclick="return confirm('Czy napewno chcesz cofnąć delegację {{ delegacja }} ?');"/>
+                                 </form>
+                             </td>
+                          {% endif %}
+                      {% endif %}
+
+                        <!-- pracownik wnioskuje o akceptacje delegacje -->
+                      {% if czy_delegowany == "TAK" and not delegacja.do_managera %}
+                          {% if not delegacja.akceptacja_planowanej %}
+                          <td>
+                              <form action="{% url 'wnioskuj_delegacje' delegacja.id %}" method="post">
+                                  {% csrf_token %}
+                                  <input type="submit" value="Wnioskuj delegacje" class="btn btn-info"
+                                     onclick="return confirm('Czy dodałeś wszystkie planowane wydatki dla delegacji {{ delegacja }} ? Po kliknięciu wnioskuj nie będziesz mógł ich już zmieniać');"/>
+                              </form>
+                          </td>
+                          {% endif %}
+
+                          <!-- pracownik wnioskuje o akceptacje wydatków -->
+                          {% if delegacja.akceptacja_planowanej and  not delegacja.akceptacja_zrealizowanej%}
+                          <td>
+                              <form action="{% url 'wnioskuj_wydatki' delegacja.id %}" method="post">
+                                  {% csrf_token %}
+                                  <input type="submit" value="Wnioskuj wydatki" class="btn btn-info"
+                                     onclick="return confirm('Czy dodałeś wszystkie zrealizowane wydatki dla delegacji {{ delegacja }} ? Po kliknięciu wnioskuj nie będziesz już ich mógł zmieniać');"/>
+                              </form>
+                          </td>
+                          {% endif %}
+                      {% endif %}
+
+                      <!-- możliwość usunięcia kiedy jeszcze nie jest zatwierdzona -->
+                      {% if not delegacja.akceptacja_planowanej or not delegacja.akceptacja_zrealizowanej %}
+                      <td>
+                          <form action="{% url 'usun_delegacje' delegacja.id %}" method="post">
+                              {% csrf_token %}
+                              <input type="submit" value="Usuń delegację" class="btn btn-danger"
+                                     onclick="return confirm('Czy napewno chcesz usunąć delegację {{ delegacja }} ?');"/>
+                          </form>
+                      </td>
+                      {% endif %}
+
+                    <!-- księgowość księguje wydatek -->
+                    {% if czy_ksiegowosc == "TAK" and delegacja.akceptacja_zrealizowanej %}
+                        {% if  not delegacja.delegacja_zaksiegowana %}
+                            <td>
+                              <form action="{% url 'zaksieguj_delegacje' delegacja.id %}" method="post">
+                                  {% csrf_token %}
+                                  <input type="submit" value="Zaksięguj" class="btn btn-info"
+                                     onclick="return confirm('Czy napewno chcesz zaksięgować delegację {{ delegacja }} ?');"/>
+                              </form>
+                          </td>
+                        {% else %}
+                            <td><button type="button" class="btn btn-success">Zaksięgowano</button></td>
+                        {% endif %}
+                    {% endif %}
+                </tr>
+            </tbody>
+
+          </table>
+
+          {% if delegacja.akceptacja_planowanej  %}
+               <!-- ZREALIZOWANE WYDATKI -->
+                <div class="card"><h5>Zrealizowane wydatki</h5></div>
+                {% if czy_delegowany == "TAK" and not delegacja.do_managera and not delegacja.akceptacja_zrealizowanej %}
+                    <!-- tylko pracownik powinien móc dodać wydatki ( a może nie )-->
+                    <div class="card"><h5>Dodaj zrealizowane wydatki</h5></div>
+                    <!--enctype="multipart/form-data" trzeba dodać podobno żeby uploadować pliki-->
+                    <form action="{% url 'wypelnij_delegacje' delegacja.id %}" method="post" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <table>
+                                {{ formRealized.as_table }}
+                            </table>
+                            {% csrf_token %}
+
+                        <input type="submit" value="Dodaj zrealizowany wydatek" class="btn btn-info"/>
+                        </div>
+                    </form>
+                {% endif %}
+
+              <table class="table table-dark">
+                <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Rodzaj zrealizowanego wydatku</th>
+                      <th scope="col">Rodzaj zrealizowanej płatności</th>
+                      <th scope="col">Kwota</th>
+                      <th scope="col">Waluta</th>
+                      <th scope="col">Dokument 1</th>
+                      <th scope="col">Dokument 2</th>
+                      <th scope="col">Dokument 3</th>
+                    </tr>
+                </thead>
+
+                 <tbody>
+                {% for zrealizowany_wydatek in zrealizowane_wydatki %}
+                    <tr>
+                          <th scope="row">{{ zrealizowany_wydatek.delegacja.pk }}</th>
+
+                          <td>{{ zrealizowany_wydatek.rodzaj_wydatku }}</td>
+
+                          <td>{{ zrealizowany_wydatek.rodzaj_zrealizowanej_platnosci }}</td>
+
+                          <td>{{ zrealizowany_wydatek.kwota }}</td>
+
+                          <td>{{ zrealizowany_wydatek.waluta }}</td>
+
+
+                            <td>
+                                {% if zrealizowany_wydatek.dokument1 %}
+                               <a href="{{ zrealizowany_wydatek.dokument1.url }}" data-lightbox="home-images">
+                                dokument 1
+                              </a>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if zrealizowany_wydatek.dokument2 %}
+                               <a href="{{ zrealizowany_wydatek.dokument2.url }}" data-lightbox="home-images">
+                                dokument 2
+                              </a>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if zrealizowany_wydatek.dokument3 %}
+                               <a href="{{ zrealizowany_wydatek.dokument3.url }}" data-lightbox="home-images">
+                                dokument 3
+                              </a>
+                                {% endif %}
+                            </td>
+
+
+                            <!-- jak już jest zaakceptowana to nie można usuwać wydatku-->
+                          {% if not delegacja.akceptacja_zrealizowanej and not delegacja.do_managera %}
+                          <td>
+                              <form action="{% url 'usun_zrealizowany_wydatek' delegacja.id zrealizowany_wydatek.id %}" method="post">
+                                  {% csrf_token %}
+                                  <input type="submit" value="Usuń" class="btn btn-danger"/>
+                              </form>
+                          </td>
+                          {% else %}
+                          <!-- teraz można księgować wydatki -->
+                          {% if czy_ksiegowosc == "TAK" %}
+                            {% if not zrealizowany_wydatek.wydatek_zaksiegowany %}
+                                <td>
+                                  <form action="{% url 'zaksieguj_wydatek' delegacja.id zrealizowany_wydatek.id %}" method="post">
+                                      {% csrf_token %}
+                                      <input type="submit" value="Zaksięguj wydatek" class="btn btn-info"
+                                     onclick="return confirm('Czy napewno chcesz zaksiegować wydatek {{ zrealizowany_wydatek }} ?');"/>
+                                  </form>
+                              </td>
+                            {% else %}
+                                <td><button type="button" class="btn btn-success">Zaksięgowano</button></td>
+                            {% endif %}
+                        {% endif %}
+
+                          {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+
+              </table>
+          {% else %}
+                <!-- PLANOWANE WYDATKI -->
+                <!-- tylko pracownik powinien móc dodać planowane wydatki -->
+                {% if czy_delegowany == "TAK" and not delegacja.do_managera %}
+                    <div class="card"><h5>Dodaj planowane wydatki.</h5></div>
+                    <form action="{% url 'wypelnij_delegacje' delegacja.id %}" method="post">
+                        <div class="form-group">
+                            <table>
+                                {{ formPlanned.as_table }}
+                            </table>
+                            {% csrf_token %}
+
+                        <input type="submit" value="Dodaj planowany wydatek" class="btn btn-info"/>
+                        </div>
+                    </form>
+                {% endif %}
+          {% endif %}
+          <div class="card"><h5>Planowane wydatki</h5></div>
+          <table class="table table-dark">
+            <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Rodzaj Wydatku</th>
+                  <th scope="col">Rodzaj płatności</th>
+                  <th scope="col">Kwota</th>
+                  <th scope="col">Waluta</th>
+                </tr>
+            </thead>
+
+             <tbody>
+            {% for planowany_wydatek in planowane_wydatki %}
+                <tr>
+                      <th scope="row">{{ planowany_wydatek.delegacja.pk }}</th>
+
+                      <td>{{ planowany_wydatek.rodzaj_wydatku }}</td>
+
+                      <td>{{ planowany_wydatek.rodzaj_platnosci }}</td>
+
+                      <td>{{ planowany_wydatek.kwota }}</td>
+
+                      <td>{{ planowany_wydatek.waluta }}</td>
+                    {% if not delegacja.akceptacja_planowanej and not delegacja.do_managera %}
+                      <td>
+                          <form action="{% url 'usun_wydatek' delegacja.id planowany_wydatek.id %}" method="post">
+                              {% csrf_token %}
+                              <input type="submit" value="Usuń" class="btn btn-danger"/>
+                          </form>
+                      </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+
+          </table>
+
+
+
+
+        {% endif %}
+
+
+{% endblock %}

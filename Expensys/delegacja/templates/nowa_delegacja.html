@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card"><h5>Wypełnij formularz i wciśnij przycisk Utwórz</h5></div>
+
+
+<form action="{% url 'nowa_delegacja' %}" method="post">
+
+    <table class="table table-dark">
+    {{ form.as_table }}
+    </table>
+
+    {% csrf_token %}
+
+    <input type="submit" value="Utwórz" class="btn btn-info"/>
+</form>
+
+
+{% endblock %}

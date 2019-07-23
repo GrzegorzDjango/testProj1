@@ -1,0 +1,52 @@
+<!--load staticfiles-->
+{% load static %}
+
+
+<head>
+    <meta charset="UTF-8">
+
+      <!-- Font Awesome -->
+      <link rel="stylesheet" href="{% static 'css\all.css' %}">
+      <!-- Bootstrap -->
+      <link rel="stylesheet" href="{% static 'css\bootstrap.css' %}">
+      <!-- Custom -->
+      <link rel="stylesheet" href="{% static 'css\style.css' %}">
+      <!-- Ligthbox -->
+      <link rel="stylesheet" href="{% static 'css\lightbox.min.css' %}">
+
+    <!--<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">-->
+    <!--<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>-->
+
+    <title>Expense Portal {% block title %}{% endblock %}</title>
+</head>
+
+<div class="jumbotron">
+<body>
+
+ <!--Top Bar
+ % include 'partials/_topbar.html' % -->
+
+ <!--Nav Bar-->
+{% include 'partials/_navbar.html' %}
+
+ <!-- Alerty-->
+ {% include 'partials/_alerts.html' %}
+
+{% block content %}
+
+{% endblock %}
+
+<!-- Footer -->
+{% include 'partials/_footer.html' %}
+
+
+  <script src="{% static 'js\jquery-3.3.1.min.js' %}"></script>
+  <script src="{% static 'js\bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'js\lightbox.min.js' %}"></script>
+  <script src="{% static 'js\main.js' %}"></script>
+
+</body>
+</div>
+
+
+

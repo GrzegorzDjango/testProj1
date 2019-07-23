@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card">
+  <div class="card-body">
+    Delegacje do zaksięgowania
+  </div>
+</div>
+
+        {% if delegacje_do_zaksiegowania %}
+
+          <table class="table table-dark">
+            <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Pracownik</th>
+                  <th scope="col">Kraj</th>
+                  <th scope="col">Miasto</th>
+                  <th scope="col">Data Wniosku</th>
+                  <th scope="col">Początek</th>
+                  <th scope="col">Koniec</th>
+                </tr>
+            </thead>
+
+             <tbody>
+            {% for delegacja in delegacje_do_zaksiegowania %}
+                <tr>
+                      <th scope="row">{{ delegacja.pk }}</th>
+
+                      <td>{{ delegacja.pracownik }}</td>
+
+                      <td>{{ delegacja.kraj }}</td>
+
+                      <td>{{ delegacja.miasto }}</td>
+
+                      <td>{{ delegacja.data_wniosku }}</td>
+
+                      <td>{{ delegacja.poczatek }}</td>
+
+                      <td>{{ delegacja.koniec }}</td>
+
+                      <td>
+                          <form action="{% url 'wypelnij_delegacje' delegacja.id %}" method="post">
+                              {% csrf_token %}
+                              <input type="submit" value="Zobacz" class="btn btn-info"/>
+                          </form>
+                      </td>
+
+
+                </tr>
+            {% endfor %}
+            </tbody>
+
+          </table>
+        {% endif %}
+{% endblock %}

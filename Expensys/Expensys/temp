@@ -1,0 +1,37 @@
+superuser: greg abc@123
+users: gkania, kliszniewska pmiotke mtaberski abc123
+
+      <!--&lt;!&ndash; Font Awesome &ndash;&gt;-->
+      <!--<link rel="stylesheet" href="{% static 'css/all.css' %}">-->
+      <!--&lt;!&ndash; Bootstrap &ndash;&gt;-->
+      <!--<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">-->
+      <!--&lt;!&ndash; Custom &ndash;&gt;-->
+      <!--<link rel="stylesheet" href="{% static 'css/style.css' %}">-->
+      <!--&lt;!&ndash; Ligthbox &ndash;&gt;-->
+      <!--<link rel="stylesheet" href="{% static 'css/lightbox.min.css' %}">-->
+
+
+  <!--<script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>-->
+  <!--<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>-->
+  <!--<script src="{% static 'js/lightbox.min.js' %}"></script>-->
+  <!--<script src="{% static 'js/main.js' %}"></script>-->
+
+
+  moi_pracownicy
+{{ moi_pracownicy1 }}
+{% for pr in moi_pracownicy %}
+<br>
+    {{ pr.manager }}
+    {{ pr.pracownik }}
+    x
+{% endfor %}
+<br>
+{{ me }}
+<br>
+{{ user.username }}
+
+<td>
+   <a href="{{ zrealizowany_wydatek.dokument1.url }}" data-lightbox="home-images">
+    <img src="{{ zrealizowany_wydatek.dokument1.url }}" alt="" class="img-fluid">
+  </a>
+</td>
